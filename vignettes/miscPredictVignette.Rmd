@@ -1,0 +1,35 @@
+---
+title: "Using miscPredict for evaluating properties of protein signatures"
+author: "Dirk F Moore"
+date: "`r Sys.Date()`"
+output:
+  #word_document:
+   # toc: yes
+  html_document:
+    toc: yes
+    df_print: paged
+vignette: |
+  %\VignetteIndexEntry{Using miscPredict for evaluating properties of protein signatures}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  #collapse = TRUE,
+  comment = "#>",
+  fig.width = 4,
+  fig.height = 4,
+  message = FALSE,
+  warning = FALSE,
+  tidy.opts = list(
+    keep.blank.line = TRUE,
+    width.cutoff = 150
+    ),
+  options(width = 150),
+  eval = TRUE
+)
+```
+
+\newpage
+
+# 1. Getting started 'miscPredict'.

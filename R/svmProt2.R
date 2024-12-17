@@ -2,7 +2,16 @@
 # cross-validation of svm
 # # # # # # # # #
 
-
+#' create svm model for crossvalidation; for internal use
+#' @param XTrain training data
+#' @param YTrain response for training data
+#' @param XTest test data
+#' @param YTest response for test data
+#' @return result data structure with properties
+#' @import e1071
+#' @import pROC
+#' @import crossval
+#' @export
 
 svmProt2 <- function(XTrain, YTrain, XTest, YTest) {
   library(crossval)

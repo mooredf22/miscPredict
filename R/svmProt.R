@@ -1,15 +1,25 @@
+
+#' create svm model to predict yy from xx and report the properties
+#' @param xx data frame of data
+#' @param yy actual reponse variable to be predicted
+#' @return result data structure with properties
+#' @import e1071
+#' @import pROC
+#' @import crossval
+#' @export
 svmProt <- function(xx, yy) {
   # xx is a matrix of samples with columns indicating protein signature names
   # yy is a factor variable of 1's and 0's
   # now set up for svm:
-  library(e1071)
-  library(pROC)
-  library(crossval)  # need for "confusionMatrix" and "diagnosticErrors"
+  #library(e1071)
+  #library(pROC)
+  #library(crossval)  # need for "confusionMatrix" and "diagnosticErrors"
   x.orig <- as.data.frame(xx)
   y.orig <- as.factor(yy)
   nAll <- length(y.orig)  # number of observations
 
   #model.orig <- svm(y.orig.f ~ ., probability=TRUE, data=x.orig)
+  #browser()
   model.orig <- svm(y.orig ~ ., probability=TRUE, cross=5, data=x.orig)
   accuracy <- model.orig$tot.accuracy
   pred <- predict(model.orig, newdata=x.orig, decision.values = FALSE, probability = TRUE)
