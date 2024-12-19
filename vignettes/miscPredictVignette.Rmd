@@ -3,10 +3,10 @@ title: "Using miscPredict for evaluating properties of protein signatures"
 author: "Dirk F Moore"
 date: "`r Sys.Date()`"
 output:
-  #word_document:
-   # toc: yes
+  word_document:
+    toc: true
   html_document:
-    toc: yes
+    toc: true
     df_print: paged
 vignette: |
   %\VignetteIndexEntry{Using miscPredict for evaluating properties of protein signatures}
@@ -32,4 +32,111 @@ knitr::opts_chunk$set(
 
 \newpage
 
-# 1. Getting started 'miscPredict'.
+# 1.Introduction
+
+As described in the primary reference, Guzman Rivera et al. (2024), 
+we have data on the 
+relative abundance of 1391 proteins in serum samples for 19 MIS-C 
+patients and 40 patients divided among Kawasaki (13patients), 
+pneumonia (17 patients), and 
+asymptomatic (10 patients). Immunoglobulins were removed from the protein list. 
+The protein abundances were measured using the DIA 
+(data independent acquisition) mass spectrometry procedure. Our goal is to 
+identify protein signatures that distinguish MIS-C patients from the other
+disease types and calculate measures of predictive accuracy. 
+As explained in Guzman Rivera et al., we propose two three-protein 
+signatures and evaluate their properties. We also use signatures
+from two previously published papers and evaluate their properties using
+our data. In addition, the package described here allows users to
+input their own protein signatures to see how well they work using our data.
+
+The 'miscPredict' package takes a proposed protein signature, produces a
+predictive model using the support vector machine method, and evaluates 
+the resulting model's ability to distinguish MIS-C from the other 
+disease types. The evaluation
+includes overall error, sensitivity, specificity, and area under the ROC curve
+(AUC).
+
+# 2. Setting up the data for 'miscPredict'.
+To use the 'miscPredict' package, first download and install the
+'devtools' package and then, from github, the 'miscPredict' package:
+
+```
+install.packages("devtools")
+devtools::install_github("mooredf22/miscPredict")
+```
+
+Next, attach the 'miscPredict' package and the associated data of 
+log2-transformed protein abundance levels, and show a few
+selected rows and columns of the data frame. 
+The column names consist of sample type
+(M for MIS-C, K for Kawasaki, P for pneumonia, and A for asymptomatic)
+followed by the column number (1 through 59). The values shown
+are log2 transformed abundance levels.
+
+```{r, echo=TRUE}
+library(miscPredict)
+data(logMISCdata)
+round(logMISCdata[1:5,c(1:2, 20:21,33:34,50:51 )], digits=2)
+```
+
+Finally, we extract the list
+of gene names corresponding to the proteins:
+
+```{r, echo=TRUE}
+geneList <- matrix(unlist(strsplit(x=rownames(logMISCdata), split ="_")),
+                   ncol=2, byrow=TRUE)[,1]
+```
+
+# Obtaining predictions for protein signatures
+
+The first step is to define protein signatures by creating vectors of
+the corresponding gene names. Here are the two signatures discussed
+in Guzman Rivera et al. (2024):
+
+```{r, echo=TRUE}
+genesSet1 <- c("ORM1", "SERPINA3", "AZGP1")  # Jeisac/Gennaro
+genesSet2 <- c("VWF", "FCGBP", "SERPINA3")  # Jeisac/Gennaro
+
+genes4Nygaard2024 <- c("FCGR3A", "LCP1", "SERPINA3", "BCHE") #Nygaard2024
+genesYeoh <- c("CD163", "PCSK9")
+
+```
+
+Next, we define a binary variable 'grpInd' which identifies the samples
+corresponding to MIS-C and the other samples (Kawasaki, pneumonia, and
+asympatomatic). We see that there are 19 samples in the MIS-C group
+and 40 in the comparison group.
+
+```{r, echo=TRUE}
+
+grpIndUse <- matrix(unlist(strsplit(x=names(logMISCdata), split="[.]")),
+                    ncol=2, byrow=TRUE)[,1]
+grpInd <- as.numeric(grpIndUse == "M")
+# 1 indicates MIS-C, 0 indicates Kawasaki, pneumonia, or mild/asymptomatic
+table(grpInd)
+```
+Finally, the 'predictSignature' function uses the signaure (here 'geneSet2') to
+fit a support vector machine 
+prediction model and evaluate its predictive accuracy.
+
+```{r, echo=TRUE}
+pred.Set2 <- predictSignature(genesUse=genesSet2, geneNames=geneList,
+                           grpInd=grpInd, log2out=logMISCdata, cv=TRUE)
+pred.Set2$out.svm
+pred.Set2$out.cv
+```
+The model's area under the curve (AUC) is in component 'aucOut' and is 
+95.6 percent, and a 95% confidence interval is 89.6% - 100.0%.
+The cross-validated estimate of the AUC, which corrects for overfitting, 
+is 93.4 percent.
+
+The properties of Nygaard's signature may be obtained by substituting 
+in 'genes4Nygaard2024'
+
+```{r, echo=TRUE}
+pred.Set2 <- predictSignature(genesUse=genes4Nygaard2024, geneNames=geneList,
+                           grpInd=grpInd, log2out=logMISCdata, cv=TRUE)
+pred.Set2$out.svm
+pred.Set2$out.cv
+```

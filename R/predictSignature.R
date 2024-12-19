@@ -63,7 +63,8 @@ predictSignature <-
     cv.out <- NULL
     out.cv <- NULL
 
-    if (cv) cv.out = crossval(svmProt2, X=xxAll, Y=yy, K=5, B=5)
+    if (cv) cv.out = crossval(svmProt2, X=xxAll, Y=yy, K=5, B=5,
+                              verbose=FALSE)
 
     #print(resultM_Other)
     #print(cv.out)
