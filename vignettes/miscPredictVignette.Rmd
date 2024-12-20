@@ -67,11 +67,13 @@ devtools::install_github("mooredf22/miscPredict")
 ```
 
 Next, attach the 'miscPredict' package and the associated data of 
-log2-transformed protein abundance levels, and show a few
-selected rows and columns of the data frame. 
+log2-transformed protein abundance levels, and show the first five
+rows and selected columns (1, 2, 20, 21, 33, 34, 50 and 51) of the data frame. 
 The column names consist of sample type
 (M for MIS-C, K for Kawasaki, P for pneumonia, and A for asymptomatic)
-followed by the column number (1 through 59). The values shown
+followed by the column number (1 through 59). 
+The row names are a combination of the gene name and protein identifier.
+The values shown
 are log2 transformed abundance levels.
 
 ```{r, echo=TRUE}
@@ -81,18 +83,20 @@ round(logMISCdata[1:5,c(1:2, 20:21,33:34,50:51 )], digits=2)
 ```
 
 Finally, we extract the list
-of gene names corresponding to the proteins:
+of gene names corresponding to the proteins, and list the first five.
 
 ```{r, echo=TRUE}
 geneList <- matrix(unlist(strsplit(x=rownames(logMISCdata), split ="_")),
                    ncol=2, byrow=TRUE)[,1]
+head(geneList)
 ```
 
 # Obtaining predictions for protein signatures
 
 The first step is to define protein signatures by creating vectors of
 the corresponding gene names. Here are the two signatures discussed
-in Guzman Rivera et al. (2024):
+in Guzman Rivera et al. (2024) and also one signature from Nygaard (2024)
+and one from Yeoh (2024).
 
 ```{r, echo=TRUE}
 genesSet1 <- c("ORM1", "SERPINA3", "AZGP1")  # Jeisac/Gennaro
@@ -116,7 +120,7 @@ grpInd <- as.numeric(grpIndUse == "M")
 # 1 indicates MIS-C, 0 indicates Kawasaki, pneumonia, or mild/asymptomatic
 table(grpInd)
 ```
-Finally, the 'predictSignature' function uses the signaure (here 'geneSet2') to
+Finally, the 'predictSignature' function uses the signature (here 'geneSet2') to
 fit a support vector machine 
 prediction model and evaluate its predictive accuracy.
 
