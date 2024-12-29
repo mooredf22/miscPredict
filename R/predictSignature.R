@@ -11,7 +11,7 @@
 
 predictSignature <-
   function(genesUse=genesUse, geneNames=geneNames, grpInd,
-           log2out=log2out, cv=TRUE, rocPlot=TRUE) {
+           log2out=log2out, cv=TRUE) {
 
     grpselect <- {geneNames %in% genesUse}
 
@@ -51,14 +51,14 @@ predictSignature <-
     xxAll <- log2protData_sigUse
 
     table(grpIndUse)  # should be 0 or 1
-    names(log2out.c) <- grpIndUse
+    names(log2out) <- grpIndUse
     #grpIndUseM <- as.numeric({grpIndUse == "M"})
     #table(grpIndUseM)
     #yy <- as.factor(grpIndUseM)
     yy <- as.factor(grpIndUse)
 
 
-    resultM_Other <- svmProt(xx=xxAll, yy=yy)
+    out.svm <- svmProt(xx=xxAll, yy=yy)
     #library(crossval)
     cv.out <- NULL
     out.cv <- NULL
@@ -68,16 +68,19 @@ predictSignature <-
 
     #print(resultM_Other)
     #print(cv.out)
-    out.svm <- resultM_Other  # SVM prediction results
+    # SVM prediction results
+    out.auc <- matrix(c(out.svm$aucOut, out.svm$aucCI),
+                         nrow=1, ncol=3,
+                         dimnames=list("", c("AUC", "lowerCI", "upperCI")))
     out2all <- rbind(cv.out$stat, cv.out$stat.se)
     if (cv) out.cv <- out2all[,1:4]   # cross-validated SVM results
-    if (rocPlot) {
-      rocAll <- out.svm$rocAll
-      plot(rocAll, cex=1.5)
+    #if (rocPlot) {
+    #  rocAll <- out.svm$rocAll
+    #  plot(rocAll, cex=1.5)
       #sens.ci <- ci.se(rocAll)
       #plot(sens.ci, type="shape", col="lightblue")
-    }
+    #}
     result <- list(numMissing=numMissing, numMissingAfter=numMissingAfter,
-                   out.svm=out.svm, out.cv=out.cv)
+                   out.auc=out.auc, out.svm=out.svm, out.cv=out.cv)
     result
   }

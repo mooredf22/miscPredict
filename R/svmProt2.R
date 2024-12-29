@@ -55,9 +55,10 @@ svmProt2 <- function(XTrain, YTrain, XTest, YTest) {
   tableOut <- table(YTest, predictedValues)
 
 
-  rocAll <- roc(response=YTest,
+  rocAll <- suppressWarnings(roc(response=YTest,
                 predictor=attr(pred, "probabilities")[,"1"], ci=TRUE,
-                smoothed=TRUE)
+                quiet=TRUE,
+                smoothed=TRUE))
   #pick off correct column, the one with column name "1";
   # sometimes it is the first column, sometimes the second
 

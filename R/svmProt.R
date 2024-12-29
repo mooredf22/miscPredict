@@ -48,7 +48,7 @@ svmProt <- function(xx, yy) {
   # column names of predMatrix should be 1 and 0
   # otherwise predMatrix[,"1"] will not work!!
   rocAll <- roc(response=y.orig,
-                predictor=predMatrix[,"1"], ci=TRUE,
+                predictor=predMatrix[,"1"], ci=TRUE, quiet=TRUE,
                 smoothed=TRUE)
   #pick off correct column, the one with column name "1";
   # sometimes it is the first column, sometimes the second

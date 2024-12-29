@@ -32,7 +32,19 @@ knitr::opts_chunk$set(
 
 \newpage
 
-# 1.Introduction
+# 1. Introduction
+
+This vignette provides a guide to using the 'miscPredict' package to 
+build a prediction model using a proposed protein signature and evaluate the
+predictive accuracy of that model. This vignette requires
+a current version of the R programming system, and it is recommended
+that you use the RStudio interface to R. Both are available for free at,
+respectively,
+
+'https://cran.r-project.org/bin/windows/base/' and
+'https://posit.co/download/rstudio-desktop/' (windows version)
+
+An R version for Apple macOS is also available.
 
 As described in the primary reference, Guzman Rivera et al. (2024), 
 we have data on the 
@@ -57,8 +69,20 @@ disease types. The evaluation
 includes overall error, sensitivity, specificity, and area under the ROC curve
 (AUC).
 
-# 2. Setting up the data for 'miscPredict'.
-To use the 'miscPredict' package, first download and install the
+Disclaimer: This package is for research use only.
+
+# 2. Preparing the R system to run the 'miscPredict' package.
+The 'miscPredict' package requires that you first download and
+install several supporting
+packages if you haven't previously installed them. Do this using the
+'install' function as follows:
+
+```
+install.packages(c("e1071", "pROC", "crossval"))
+```
+
+Furthermore, to use the 'miscPredict' package, you must first download 
+and install the
 'devtools' package and then, from github, the 'miscPredict' package:
 
 ```
@@ -99,48 +123,137 @@ in Guzman Rivera et al. (2024) and also one signature from Nygaard (2024)
 and one from Yeoh (2024).
 
 ```{r, echo=TRUE}
-genesSet1 <- c("ORM1", "SERPINA3", "AZGP1")  # Jeisac/Gennaro
-genesSet2 <- c("VWF", "FCGBP", "SERPINA3")  # Jeisac/Gennaro
+geneSet1 <- c("ORM1", "SERPINA3", "AZGP1")  # Jeisac/Gennaro
+geneSet2 <- c("VWF", "FCGBP", "SERPINA3")  # Jeisac/Gennaro
 
-genes4Nygaard2024 <- c("FCGR3A", "LCP1", "SERPINA3", "BCHE") #Nygaard2024
-genesYeoh <- c("CD163", "PCSK9")
+geneSetNygaard <- c("FCGR3A", "LCP1", "SERPINA3", "BCHE") #Nygaard (2024)
+geneSetYeoh <- c("CD163", "PCSK9")  #Yeoh (2024)
 
 ```
 
 Next, we define a binary variable 'grpInd' which identifies the samples
 corresponding to MIS-C and the other samples (Kawasaki, pneumonia, and
-asympatomatic). We see that there are 19 samples in the MIS-C group
-and 40 in the comparison group.
+asymptomatic). Here is the distribution of the four sample groups:
 
 ```{r, echo=TRUE}
-
 grpIndUse <- matrix(unlist(strsplit(x=names(logMISCdata), split="[.]")),
                     ncol=2, byrow=TRUE)[,1]
+table(grpIndUse)
+```
+
+Since we here focus on comparing MIS-C to the three other groups,
+we define an indicator variable which is '1' for MIS-C and '0' for
+the other three comparison groups. We see that there are 19 samples 
+in the MIS-C group
+and 40 in the comparison group:
+
+```{r, echo=TRUE}
 grpInd <- as.numeric(grpIndUse == "M")
 # 1 indicates MIS-C, 0 indicates Kawasaki, pneumonia, or mild/asymptomatic
 table(grpInd)
 ```
-Finally, the 'predictSignature' function uses the signature (here 'geneSet2') to
+
+Finally, the 'predictSignature' function uses the signature to
 fit a support vector machine 
 prediction model and evaluate its predictive accuracy.
+We illustrate using geneSet2. A key measure of accuracy is
+area under the curve (AUC), obtained as follows:
 
 ```{r, echo=TRUE}
-pred.Set2 <- predictSignature(genesUse=genesSet2, geneNames=geneList,
+set.seed(424020)
+pred.Set2 <- predictSignature(genesUse=geneSet2, geneNames=geneList,
                            grpInd=grpInd, log2out=logMISCdata, cv=TRUE)
-pred.Set2$out.svm
-pred.Set2$out.cv
 ```
+
+The output data structure 'pred.Set 2' contains a number of components relevant
+to the predictive model. The results for area under the curve are 
+in the 'out.auc' component:
+```{r, echo=TRUE}
+pred.Set2$out.auc
+```
+
 The model's area under the curve (AUC) is in component 'aucOut' and is 
 95.6 percent, and a 95% confidence interval is 89.6% - 100.0%.
 The cross-validated estimate of the AUC, which corrects for overfitting, 
 is 93.4 percent.
 
-The properties of Nygaard's signature may be obtained by substituting 
-in 'genes4Nygaard2024'
+Additional details, including the sensitivity and specificity
+of the predictive model and also a table of predicted vs original
+numbers of MIS-C and non-MIS-C subjects, may be seen as follows:
 
 ```{r, echo=TRUE}
-pred.Set2 <- predictSignature(genesUse=genes4Nygaard2024, geneNames=geneList,
-                           grpInd=grpInd, log2out=logMISCdata, cv=TRUE)
 pred.Set2$out.svm
+```
+To obtain a basic ROC curve, apply the 'plot' function 
+to the 'rocAll' svm component:
+
+```{r, echo=TRUE}
+plot(pred.Set2$out.svm$rocAll)
+```
+
+An ROC curve with a 95 percent confidence interval may be obtained 
+by first using the 'ci.se' function in the pROC package to use a bootstrap
+calculation method. The 'specificities=seq(0, 1, 0.01)' command specifies a 
+list of specificities at which to calculate the confidence limits. Finally,
+the 'plot' function creates the plot. The bootstrap method uses randomly
+generated bootstrap samples. For reproducibility, one may set the 
+random number seed to a specific number.
+
+
+```{r, echo=TRUE}
+set.seed(109540)
+sens.ci <- ci.se(pred.Set2$out.svm$rocAll,  
+                 boot.n=100, boot.stratified=TRUE,
+                 specificities=seq(0, 1, 0.01))
+plot(pred.Set2$out.svm$rocAll)
+plot(sens.ci, type="shape", col="lightblue")
+
+```
+
+
+Finally, the results of cross-validation, which corrects for overfitting,
+may be obtained thus:
+
+```{r, echo=TRUE}
 pred.Set2$out.cv
+```
+
+
+The properties of Nygaard's signature may be obtained by substituting 
+in 'geneSetNygaard'
+
+```{r, echo=TRUE}
+set.seed(340863)
+pred.Set.Nygaard <- predictSignature(genesUse=geneSetNygaard, 
+                        geneNames=geneList, grpInd=grpInd, 
+                        log2out=logMISCdata, cv=TRUE)
+pred.Set.Nygaard$out.auc
+```
+
+Additional properties may be obtained by entering 'pred.Set.Nygaard$out.svm' 
+and 'pred.Set.Nygaard$out.cv' as described above. 
+
+
+
+# References
+
+Nygaard U, Nielsen AB, Dungu KHS, et al. Proteomic profiling reveals 
+diagnostic signatures and pathogenic insights in multisystem 
+inflammatory syndrome in children. Commun Biol. 2024;7(1):688. 
+doi:10.1038/s42003-024-06370-8
+
+Yeoh S, Estrada-Rivadeneyra D, Jackson H, et al. Plasma Protein 
+Biomarkers Distinguish Multisystem Inflammatory Syndrome in Children 
+From Other Pediatric Infectious and Inflammatory Diseases. 
+Pediatr Infect Dis J. 2024;43(5):444-453. doi:10.1097/INF.0000000000004267
+
+# Reproducibility
+
+Following is the output of the utility `sessionInfo`. 
+This output contains details of the packages and version numbers 
+used to generate these tutorials.
+
+
+```{r, echo=TRUE, eval=TRUE}
+print(utils::sessionInfo(), width=80)
 ```

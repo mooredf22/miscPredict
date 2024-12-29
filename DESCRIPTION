@@ -1,11 +1,29 @@
 Package: miscPredict
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Build and evaluate a prediction model to distinguish MIS-C from other diseases
+Version: 0.1.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Dirk", "Moore", , "dirk.moore@rutgers.edu", role = c("aut", "cre"))
+Description: The 'miscPredict' package takes a proposed protein signature, 
+   produces a
+   predictive model using the support vector machine method, and evaluates 
+   the resulting model's ability to distinguish MIS-C from the other 
+   disease types. The evaluationincludes overall error, sensitivity, 
+   specificity, and area under the ROC curve (AUC). The model is built
+   using data on the 
+   relative abundance of 1391 proteins in serum samples for 19 MIS-C 
+   patients and 40 patients divided among Kawasaki (13patients), 
+   pneumonia (17 patients), and 
+   asymptomatic (10 patients).
+License: MIT + file LICENCE
+Depends: 
+    R (>= 4.4.0),
+    e1071,
+    pROC
+Imports:
+    knitr,
+    stats,
+    rmarkdown,
+    utils
 VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
