@@ -14,15 +14,15 @@
 #' @export
 
 svmProt2 <- function(XTrain, YTrain, XTest, YTest) {
-  library(crossval)
+  #library(crossval)
 
   XTrain <- as.data.frame(XTrain)
   XTest <- as.data.frame(XTest)
   # xx is a matrix of samples with columns indicating protein signature names
   # now set up for svm:
-  library(e1071)
-  library(pROC)
-  library(crossval)  # need for "confusionMatrix" and "diagnosticErrors"
+  #library(e1071)
+  #library(pROC)
+  #library(crossval)  # need for "confusionMatrix" and "diagnosticErrors"
   #browser()
   #x.orig <- xx
   #y.orig <- as.factor(yy)

@@ -9,14 +9,15 @@ predictSignature(
   geneNames = geneNames,
   grpInd,
   log2out = log2out,
-  cv = TRUE,
-  rocPlot = TRUE
+  cv = TRUE
 )
 }
 \arguments{
 \item{genesUse}{vector of gene names comprising the signature}
 
 \item{geneNames}{vector of all gene names correspondint to the rows of data}
+
+\item{grpInd}{0/1 indicator for group (control / MIS-C)}
 
 \item{log2out}{log2 transformed data frame of protein abundances}
 

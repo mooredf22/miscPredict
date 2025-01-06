@@ -1,15 +1,17 @@
 ---
-title: "Using miscPredict for evaluating properties of protein signatures"
+title: "Using_miscPredict_for_evaluating_properties_of_protein_signatures"
 author: "Dirk F Moore"
 date: "`r Sys.Date()`"
 output:
-  word_document:
-    toc: true
+#  word_document:
+#    toc: true
   html_document:
     toc: true
     df_print: paged
+  pdf_document:
+    toc: true
 vignette: |
-  %\VignetteIndexEntry{Using miscPredict for evaluating properties of protein signatures}
+  %\VignetteIndexEntry{Using_miscPredict_for_evaluating_properties_of_protein_signatures}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 

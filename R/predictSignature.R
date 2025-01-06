@@ -1,9 +1,9 @@
 #' create svm model to predict yy from xx and report the properties
 #' @param genesUse vector of gene names comprising the signature
 #' @param geneNames vector of all gene names correspondint to the rows of data
+#' @param grpInd 0/1 indicator for group (control / MIS-C)
 #' @param log2out log2 transformed data frame of protein abundances
 #' @param cv if this is true, calculate cross-validation error rates
-#' @param rocPlot if this is true, show an ROC plot
 #' @return result a dataframe with properties of the predictive model
 #' @import pROC
 #' @import crossval
