@@ -16,7 +16,7 @@ Description: The 'miscPredict' package takes a proposed protein signature,
    asymptomatic (10 patients).
 License: MIT + file LICENSE
 Depends: 
-    R (>= 4.4.0),
+    R (>= 4.2.0),
     e1071,
     pROC,
     crossval

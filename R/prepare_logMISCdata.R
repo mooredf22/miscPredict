@@ -112,6 +112,8 @@ if (FALSE) {
 # get everything:
 all.ind <- rep(TRUE, nrow(miscData))
 
+table(all.ind)
+
 
 ##allData.b <- allDataXb[complete.cases(allDataXb),]
 ##dim(allData.b)
