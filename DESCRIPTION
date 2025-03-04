@@ -14,7 +14,6 @@ Description: The 'miscPredict' package takes a proposed protein signature,
    patients and 40 patients divided among Kawasaki (13patients), 
    pneumonia (17 patients), and 
    asymptomatic (10 patients).
-License: MIT + file LICENSE
 Depends: 
     R (>= 4.2.0),
     e1071,
